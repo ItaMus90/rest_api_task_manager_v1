@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcryptjs = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const userSchema = mongoose.Schema({
     name: {
@@ -39,9 +40,29 @@ const userSchema = mongoose.Schema({
                 throw new Error('Age must be a postive number');
             }
         }
-    }
+    },
+    tokens:[{
+        token: {
+            type: String,
+            required:true
+        }
+    }]
 });
 
+
+/**
+ * Each Schema can define instance and static methods for its model.
+ * Methods is functions that belong to instance of Model
+ */
+userSchema.methods.generateAuthToken = async function() {
+    const user = this;
+    const token = jwt.sign({_id: user._id.toString()}, 'taskmanagerapi');
+
+    user.tokens = user.tokens.concat({token: token});
+    await user.save();
+
+    return token;
+}
 
 /**
  * Each Schema can define instance and static methods for its model.
