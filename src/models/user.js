@@ -49,6 +49,20 @@ const userSchema = mongoose.Schema({
     }]
 });
 
+/**
+ * toJSON is a built in method
+ * and here i override and implement this method
+ * @returns {Array|Binary|*}
+ */
+userSchema.methods.toJSON = function(){
+    const user = this;
+    const userObject = user.toObject();
+
+    delete userObject.password;
+    delete userObject.tokens;
+
+    return userObject;
+}
 
 /**
  * Each Schema can define instance and static methods for its model.
